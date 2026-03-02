@@ -1,7 +1,11 @@
-# SGBD – Web-Based Database Management System
+# MySqlAdmin – Web-Based Database Management System
 
 A lightweight, modern web-based MySQL database manager built with PHP and PDO.  
 Similar to phpMyAdmin, but with a clean, minimal interface.
+
+## Screenshot
+
+![Screenshot](./assets/img/screenshots/01.png)
 
 ## Features
 

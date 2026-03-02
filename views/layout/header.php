@@ -16,7 +16,7 @@ $currentTable = $_GET['table'] ?? '';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SGBD – Database Manager</title>
+    <title>MySqlAdmin - Database Manager</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <!-- Lucide Icons via CDN -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
@@ -31,7 +31,7 @@ $currentTable = $_GET['table'] ?? '';
 <nav class="navbar">
     <div class="navbar-brand">
         <a href="index.php?page=dashboard">
-            <span class="logo-icon">&#9881;</span> SGBD
+            <span class="logo-icon">&#9881;</span> MySqlAdmin
         </a>
     </div>
     <div class="navbar-menu">
