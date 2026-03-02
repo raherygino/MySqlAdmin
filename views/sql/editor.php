@@ -63,65 +63,133 @@ require_once __DIR__ . '/../layout/header.php';
 <?php endif; ?>
 
 <!-- Results -->
-<?php if ($results !== null): ?>
-<div class="card">
-    <div class="card-header">
-        <h3>Results</h3>
-        <span class="result-meta">
-            <?= count($results) ?> row(s) returned in <?= $executionTime ?>ms
-        </span>
+<?php if (!empty($statementResults)): ?>
+    <?php foreach ($statementResults as $i => $r): ?>
+    <div class="card">
+        <div class="card-header">
+            <h3>Statement <?= $i + 1 ?></h3>
+            <span class="result-meta"><?= $executionTime ?>ms total</span>
+        </div>
+        <div class="form-card" style="padding-top: 0.75rem; padding-bottom: 0.75rem;">
+            <div class="sql-statement" style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-light); white-space: pre-wrap;">
+                <?= h($r['sql']) ?>
+            </div>
+        </div>
+
+        <?php if (($r['type'] ?? '') === 'resultset'): ?>
+            <div class="card-header" style="border-top: 1px solid var(--border);">
+                <h3>Results</h3>
+                <span class="result-meta"><?= (int)($r['row_count'] ?? 0) ?> row(s) returned</span>
+            </div>
+            <?php if (!empty($r['rows'])): ?>
+            <div class="table-responsive">
+                <table class="data-table data-table-striped">
+                    <thead>
+                        <tr>
+                            <?php foreach (($r['columns'] ?? []) as $col): ?>
+                            <th><?= h($col) ?></th>
+                            <?php endforeach; ?>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($r['rows'] as $row): ?>
+                        <tr>
+                            <?php foreach (($r['columns'] ?? []) as $col): ?>
+                            <td>
+                                <?php
+                                $val = $row[$col] ?? null;
+                                if ($val === null) {
+                                    echo '<em class="muted">NULL</em>';
+                                } elseif (is_string($val) && strlen($val) > 200) {
+                                    echo h(substr($val, 0, 200)) . '...';
+                                } else {
+                                    echo h($val);
+                                }
+                                ?>
+                            </td>
+                            <?php endforeach; ?>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            <?php else: ?>
+            <div class="empty-state-box">
+                <p>Query executed successfully. 0 rows returned.</p>
+            </div>
+            <?php endif; ?>
+        <?php else: ?>
+            <div class="card-header" style="border-top: 1px solid var(--border);">
+                <h3>Query Executed</h3>
+                <span class="result-meta">OK</span>
+            </div>
+            <div class="result-summary">
+                <p><strong><?= (int)($r['affected_rows'] ?? 0) ?></strong> row(s) affected.</p>
+            </div>
+        <?php endif; ?>
     </div>
-    <?php if (!empty($results)): ?>
-    <div class="table-responsive">
-        <table class="data-table data-table-striped">
-            <thead>
-                <tr>
-                    <?php foreach ($columns as $col): ?>
-                    <th><?= h($col) ?></th>
+    <?php endforeach; ?>
+<?php else: ?>
+    <?php if ($results !== null): ?>
+    <div class="card">
+        <div class="card-header">
+            <h3>Results</h3>
+            <span class="result-meta">
+                <?= count($results) ?> row(s) returned in <?= $executionTime ?>ms
+            </span>
+        </div>
+        <?php if (!empty($results)): ?>
+        <div class="table-responsive">
+            <table class="data-table data-table-striped">
+                <thead>
+                    <tr>
+                        <?php foreach ($columns as $col): ?>
+                        <th><?= h($col) ?></th>
+                        <?php endforeach; ?>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($results as $row): ?>
+                    <tr>
+                        <?php foreach ($columns as $col): ?>
+                        <td>
+                            <?php
+                            $val = $row[$col] ?? null;
+                            if ($val === null) {
+                                echo '<em class="muted">NULL</em>';
+                            } elseif (strlen($val) > 200) {
+                                echo h(substr($val, 0, 200)) . '...';
+                            } else {
+                                echo h($val);
+                            }
+                            ?>
+                        </td>
+                        <?php endforeach; ?>
+                    </tr>
                     <?php endforeach; ?>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($results as $row): ?>
-                <tr>
-                    <?php foreach ($columns as $col): ?>
-                    <td>
-                        <?php
-                        $val = $row[$col] ?? null;
-                        if ($val === null) {
-                            echo '<em class="muted">NULL</em>';
-                        } elseif (strlen($val) > 200) {
-                            echo h(substr($val, 0, 200)) . '...';
-                        } else {
-                            echo h($val);
-                        }
-                        ?>
-                    </td>
-                    <?php endforeach; ?>
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
-    <?php else: ?>
-    <div class="empty-state-box">
-        <p>Query executed successfully. 0 rows returned.</p>
+                </tbody>
+            </table>
+        </div>
+        <?php else: ?>
+        <div class="empty-state-box">
+            <p>Query executed successfully. 0 rows returned.</p>
+        </div>
+        <?php endif; ?>
     </div>
     <?php endif; ?>
-</div>
-<?php endif; ?>
 
-<!-- Affected Rows (for non-SELECT queries) -->
-<?php if ($affectedRows !== null): ?>
-<div class="card">
-    <div class="card-header">
-        <h3>Query Executed</h3>
-        <span class="result-meta">Completed in <?= $executionTime ?>ms</span>
+    <!-- Affected Rows (for non-SELECT queries) -->
+    <?php if ($affectedRows !== null): ?>
+    <div class="card">
+        <div class="card-header">
+            <h3>Query Executed</h3>
+            <span class="result-meta">Completed in <?= $executionTime ?>ms</span>
+        </div>
+        <div class="result-summary">
+            <p><strong><?= (int)$affectedRows ?></strong> row(s) affected.</p>
+        </div>
     </div>
-    <div class="result-summary">
-        <p><strong><?= (int)$affectedRows ?></strong> row(s) affected.</p>
-    </div>
-</div>
+    <?php endif; ?>
 <?php endif; ?>
 
 <script>
