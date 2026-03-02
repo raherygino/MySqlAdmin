@@ -26,11 +26,71 @@ Similar to phpMyAdmin, but with a clean, minimal interface.
 
 1. Clone or copy this folder into your web server root:
    ```
-   c:\xampp\htdocs\SGBD\
+   c:\xampp\htdocs\MySqlAdmin\
    ```
 2. Start Apache and MySQL from the XAMPP Control Panel.
 3. Open your browser and navigate to:
    ```
-   http://localhost/SGBD/
+   http://localhost/MySqlAdmin/
    ```
 4. Log in with your MySQL credentials (default: `root` / empty password).
+## Project Structure
+
+```
+MySqlAdmin/
+├── index.php                    # Front controller / router
+├── config/
+│   └── database.php             # PDO connection class
+├── helpers/
+│   └── functions.php            # Utility functions (session, flash, escaping)
+├── controllers/
+│   ├── AuthController.php       # Login / logout
+│   ├── DashboardController.php  # Server overview
+│   ├── DatabaseController.php   # Database CRUD
+│   ├── TableController.php      # Table operations
+│   ├── ColumnController.php     # Column operations
+│   ├── RecordController.php     # Record CRUD with pagination
+│   ├── SqlController.php        # Custom SQL query editor
+│   ├── ImportController.php     # SQL file import
+│   └── ExportController.php     # SQL file export
+├── views/
+│   ├── layout/
+│   │   ├── header.php           # Shared navigation & breadcrumbs
+│   │   └── footer.php           # Shared footer & scripts
+│   ├── auth/
+│   │   └── login.php            # Login page
+│   ├── dashboard.php            # Server dashboard
+│   ├── database/
+│   │   ├── list.php             # Database listing
+│   │   └── create.php           # Create database form
+│   ├── table/
+│   │   ├── list.php             # Table listing
+│   │   ├── create.php           # Create table form
+│   │   └── structure.php        # Table structure view
+│   ├── column/
+│   │   ├── add.php              # Add column form
+│   │   └── edit.php             # Edit column form
+│   ├── record/
+│   │   ├── browse.php           # Browse records (paginated)
+│   │   ├── insert.php           # Insert record form
+│   │   └── edit.php             # Edit record form
+│   ├── sql/
+│   │   └── editor.php           # SQL query editor
+│   ├── import/
+│   │   └── import.php           # Import SQL file
+│   └── export/
+│       └── export.php           # Export database/table
+└── assets/
+    ├── css/
+    │   └── style.css            # Main stylesheet
+    └── js/
+        └── app.js               # Client-side interactions
+```
+
+## Security Notes
+
+- All database queries use **PDO prepared statements** where user data is involved.
+- All HTML output is escaped with `htmlspecialchars()` via the `h()` helper.
+- Database names and table names are validated with regex (`[a-zA-Z0-9_]+`).
+- Session credentials are stored server-side; no passwords in URLs or cookies.
+- File imports are validated by extension and size.
